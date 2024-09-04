@@ -5,7 +5,7 @@ import authService from '../services/auth.service';
 const authMiddleware = async (req: any, res: Response, next: NextFunction) => {
   try {
     const token = req.cookies['Authorisation'];
-
+    console.log('token', token);
     if (!token) {
       return res.status(401).json({ error: 'Unauthorized by cookie' });
     }
@@ -14,6 +14,7 @@ const authMiddleware = async (req: any, res: Response, next: NextFunction) => {
     if (!userResp) {
       return res.status(401).json({ error: 'Unauthorized by verification' });
     }
+    console.log('userResp', userResp);
 
     const userCheckDB = await userService.findUserByEmail(userResp.email);
     if (!userCheckDB) {

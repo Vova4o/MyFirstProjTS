@@ -7,6 +7,7 @@ const user = Router();
 user.get('/', authMiddleware, getUser);
 
 // user.get('/all', authMiddleware, getAllUsers);
+// user.get('/all', getall);
 
 user.get('/products', authMiddleware, showUserProducts);
 
