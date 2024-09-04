@@ -11,7 +11,7 @@ export const registerUser = async (req: any, res: Response) => {
     // here we check if email is not provided
     if (!email || !name) {
       return res.status(400).json({
-        message: "Email is required"
+        message: "Email or Name is required"
       });
     }
 
@@ -26,7 +26,7 @@ export const registerUser = async (req: any, res: Response) => {
 
     // here we check if email is not already registered
     const user = await userService.findUserByEmail(email);
-    if (!user) {
+    if (user) {
       return res.status(400).json({
         message: "Cannot register with this email"
       });
@@ -66,7 +66,7 @@ export const registerUser = async (req: any, res: Response) => {
      * here we send email
      */
     try {
-        await MailerService.sendMail(newUser.email, "Activate your account", "", htmlMsg);
+        await MailerService.sendMail(newUser.email, "Activate your account", "some text", htmlMsg);
     } catch (error) {
         return res.status(500).json({
             message: "Cannot send email"
@@ -108,7 +108,7 @@ export const loginUser = async (req: any, res: Response) => {
             });
         }
 
-        res.cookie('authorisation', token, { 
+        res.cookie('Authorisation', token, { 
             httpOnly: false,
             secure: false,
             maxAge: 3600000

@@ -1,25 +1,31 @@
 import { Request, Response, NextFunction } from 'express';
 import userService from '../services/user.service';
+import authService from '../services/auth.service';
 
 const authMiddleware = async (req: any, res: Response, next: NextFunction) => {
   try {
-    const email = String(req.query.email);
+    const token = req.cookies['authorisation'];
 
-    if (!email) {
-      return res.status(400).json({ error: 'Email is required' });
+    if (!token) {
+      return res.status(401).json({ error: 'Unauthorized' });
     }
 
-    const userResp = await userService.findUserByEmail(email);
-
+    const userResp = authService.verifyToken(token);
     if (!userResp) {
-      return res.status(404).json({ error: 'User not found' });
+      return res.status(401).json({ error: 'Unauthorized' });
     }
 
-    req.user = userResp;
+    const userCheckDB = await userService.findUserByEmail(userResp.email);
+    if (!userCheckDB) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    req.user = userCheckDB;
 
     next();
   } catch (error) {
-    return res.status(500).json({ error: 'Internal server error' });
+    console.log('internal server error', error);
+    return res.status(500).json({ error: 'Internal server error auth' });
   }
 };
 
