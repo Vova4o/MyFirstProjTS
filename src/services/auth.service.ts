@@ -16,9 +16,7 @@ class AuthService {
         try {
             // Генерация JWT токена
             const payload = {
-                id: user.id,
-                name: user.name,
-                email: user.email
+                id: user.id
             };
 
             const token = jwt.sign(payload, SECRET_KEY, { expiresIn: '12h' });

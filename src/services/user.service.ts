@@ -4,13 +4,33 @@ const prisma = new PrismaClient();
 
 class UserService {
     public async findUserByEmail(email: string): Promise<User | null> {
-        const user = await prisma.user.findUnique({
-            where: {
-                email
-            }
-        });
-        return user;
+        try {
+            const user = await prisma.user.findUnique({
+                where: {
+                    email
+                }
+            });
+            return user;
+        } catch (error) {
+            console.log(error);
+            return null;
+        }
     }
+
+    public async findUserById(id: number): Promise<User | null> {
+        try {
+            const user = await prisma.user.findUnique({
+                where: {
+                    id
+                }
+            });
+            return user;
+        } catch (error) {
+            console.log(error);
+            return null;
+        }
+    }
+
 
     public async findAllUsers(): Promise<User[]> {
         try {

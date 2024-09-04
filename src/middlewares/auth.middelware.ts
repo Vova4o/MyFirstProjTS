@@ -16,7 +16,7 @@ const authMiddleware = async (req: any, res: Response, next: NextFunction) => {
     }
     console.log('userResp', userResp);
 
-    const userCheckDB = await userService.findUserByEmail(userResp.email);
+    const userCheckDB = await userService.findUserById(userResp.id);
     if (!userCheckDB) {
       return res.status(401).json({ error: 'Unauthorized by DB' });
     }
