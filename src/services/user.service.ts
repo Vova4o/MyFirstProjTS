@@ -13,8 +13,13 @@ class UserService {
     }
 
     public async findAllUsers(): Promise<User[]> {
-        const users = await prisma.user.findMany();
-        return users;
+        try {
+            const users: User[] = await prisma.user.findMany();
+            return users;
+        } catch (error) {
+            console.log(error);
+            return [];
+        }
     }
 
     public async showUserProducts(userId: number): Promise<any> {
@@ -28,6 +33,24 @@ class UserService {
         });
         return products;
     }
+
+    public async createUser(email: string, name: string): Promise<User> {
+        try {
+            console.log("user.service", email, name);
+            const user = await prisma.user.create({
+                data: {
+                    name,
+                    email
+                }
+            });
+            console.log("User created successfully");
+            return user;
+        } catch (error) {
+            console.log(error);
+            return {} as User;
+        }
+    }
 }
+
 export default new UserService();
    

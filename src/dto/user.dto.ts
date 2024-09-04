@@ -1,6 +1,13 @@
+import { Category, Product } from "@prisma/client";
+
 export interface CreateUserDTO {
     name: string;
     email: string;
+}
+
+export interface IProductWithCategory {
+    product: Product;
+    category: Category;
 }
 
 
