@@ -3,7 +3,7 @@ import userService from '../services/user.service';
 
 const authMiddleware = async (req: any, res: Response, next: NextFunction) => {
   try {
-    const email = req.query.email as string;
+    const email = String(req.query.email);
 
     if (!email) {
       return res.status(400).json({ error: 'Email is required' });
