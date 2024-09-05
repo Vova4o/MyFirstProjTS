@@ -1,7 +1,10 @@
 import { Response } from "express";
+import bcrypt from "bcrypt";
 import userService from "../services/user.service";
 import AuthService from "../services/auth.service";
 import MailerService from "../services/mailer.service";
+import User from ".prisma/client";
+
 
 export const registerUser = async (req: any, res: Response) => {
   try {
@@ -172,7 +175,7 @@ export const loginUser = async (req: any, res: Response) => {
         
     
         return res.status(200).json({
-        message: "User logged in successfully"
+        message: "User logged in successfully, email with auth sent"
         });
     } catch (error: any) {
         return res.status(500).json({
@@ -181,3 +184,105 @@ export const loginUser = async (req: any, res: Response) => {
         });
     }
   };
+
+  const SALT_ROUNDS = 10;
+
+  export const registerWithPasswordUser = async (req: any, res: Response) => {
+    const { email, password } = req.body;
+
+  if (!email || !password) {
+    return res.status(400).json({
+      message: "Email and password are required"
+    });
+  }
+
+  if (!email.includes("@")) {
+    return res.status(400).json({
+      message: "Email is not valid"
+    });
+  }
+
+  try {
+    const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
+    const newUser = await userService.createUserWithPassword(email, hashedPassword);
+    if (!newUser) {
+      return res.status(500).json({
+        message: "Cannot register user"
+      });
+    }
+
+    if (typeof newUser === "string") {
+      return res.status(400).json({
+        message: newUser
+      });
+    }
+
+    return res.status(201).json({
+      message: "User registered successfully",
+      user: newUser.id
+    });
+  } catch (error: any) {
+    return res.status(500).json({
+      message: "Internal server error",
+      error: error.message
+    });
+  }
+};
+
+
+export const loginWithPasswordUser = async (req: any, res: Response) => {
+  console.log("loginWithPasswordUser");
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+    return res.status(400).json({
+      message: "Email or password is required"
+    });
+  }
+
+  try {
+    const userDbInst = await userService.findUserByEmail(email);
+    console.log(userDbInst);
+    if (!userDbInst) {
+      return res.status(400).json({
+        message: "Invalid email or password"
+      });
+    }
+
+    if (userDbInst.password === null) {
+      return res.status(400).json({
+        message: "User registered without password"
+      });
+    }
+
+    const isPasswordValid = await bcrypt.compare(password, userDbInst.password);
+    console.log("is password valid", isPasswordValid);
+    if (!isPasswordValid) {
+      return res.status(400).json({
+        message: "Invalid email or password"
+      });
+    }
+
+    const token = AuthService.generateToken(userDbInst);
+    if (!token) {
+      return res.status(500).json({
+        message: "Cannot generate token"
+      });
+    }
+    
+    res.cookie('Authorisation', token, { 
+        httpOnly: false,
+        secure: false,
+        maxAge: 3600000
+    });
+
+    return res.status(200).json({
+      message: "User logged in successfully"
+      });
+  } catch (error: any) {
+    return res.status(500).json({
+      message: "Internal server error",
+      error: error.message
+    });
+  }
+};

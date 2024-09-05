@@ -70,6 +70,32 @@ class UserService {
             return {} as User;
         }
     }
+
+    
+    public async createUserWithPassword(email: string, password: string): Promise<User | string> {
+        try {
+            // Проверка на существование пользователя с таким же email
+            const existingUser = await prisma.user.findUnique({
+                where: { email }
+            });
+
+            if (existingUser) {
+                return "User with this email already exists";
+            }
+
+            // Создание нового пользователя
+            const user = await prisma.user.create({
+                data: {
+                    email,
+                    password
+                }
+            });
+            return user;
+        } catch (error) {
+            console.log(error);
+            return "Cannot create user";
+        }
+    }
 }
 
 export default new UserService();

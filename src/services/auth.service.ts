@@ -1,15 +1,10 @@
 import jwt from 'jsonwebtoken';
 import dotenv from "dotenv";
+import { User } from '@prisma/client';
 
 dotenv.config();
 
 const SECRET_KEY = process.env.SECRET_KEY_ENV || "mysecretphrase"; //getting from .env
-
-interface User {
-    id: number;
-    name: string;
-    email: string;
-}
 
 class AuthService {
     public generateToken(user: User): string {
