@@ -1,15 +1,14 @@
-import { Category, Product } from "@prisma/client";
+import { Category, Product } from '@prisma/client';
 
 export interface CreateUserDTO {
-    name: string;
-    email: string;
+  name: string;
+  email: string;
 }
 
 export interface IProductWithCategory {
-    product: Product;
-    category: Category;
+  product: Product;
+  category: Category;
 }
-
 
 // // UseEmainDTO.ts
 
